@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Type Game</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('resources/Gwawa.png');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+        }
+
+        #randomWord {
+            font-size: 58px;
+            margin-bottom: 20px;
+            text-align: center;
+            margin: 40px 0;
+            color: darkorange;
+            text-shadow: 0 0 3px #000;
+        }
+        
+        #mode {
+            display: block;
+            font-size: 48px;
+            margin: 30px auto;
+            width: 400px;
+        }
+
+        #inputWord {
+            display: block;
+            margin: 0 auto;
+            width: 400px;
+            font-size: 36px;
+        }
+
+        #startButton {
+            display: block;
+            margin: 40px auto;
+            padding: 25px 50px;
+            font-size: 48px;
+            border-radius: 20px;
+            background-color: white;
+        }
+
+        #result {
+            font-size: 32px;
+            position: absolute;
+            top: 0;
+            right: 30;
+            color: orangered;
+            text-shadow: 0 0 2px #000;
+        }
+
+        #timer {
+            font-size: 32px;
+            position: absolute;
+            top:0;
+            right: 0;
+            color: black;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div id="randomWord">Press Start Button to Start</div>
+    <select id="mode">
+        <option value="english">English</option>
+        <option value="chinese">Chinese</option>
+    </select>
+    <input type="text" id="inputWord" disabled>
+    <button id="startButton">Start</button>
+    <div id="result">Score: 0</div>
+    <div id="timer">Timer: <span id="timerValue">60</span></div>
+</body>
+
+<script>
+    $(document).ready(function(){
+        var englishWords = [
+            "apple", "banana", "orange", "grape", "strawberry", "watermelon", "pineapple", "kiwi", "peach", "pear",
+            "mango", "lemon", "lime", "blueberry", "raspberry", "blackberry", "cherry", "apricot", "coconut", "papaya",
+            "plum", "fig", "melon", "cantaloupe", "nectarine", "dragonfruit", "lychee", "persimmon", "guava", "passionfruit",
+            "durian", "tangerine", "pomegranate", "avocado", "jackfruit", "cranberry", "elderberry", "boysenberry", "gooseberry",
+            "starfruit", "kumquat", "rhubarb", "currant", "quince", "mulberry", "date", "plantain", "blackcurrant", "feijoa",
+            "tamarind", "soursop", "saskatoon", "loganiaceae", "anacardiaceae", "rutaceae", "oleaceae", "rosaceae", "passifloraceae",
+            "myrtaceae", "actinidiaceae", "vitaceae", "morus", "annona", "mangifera", "psidium", "ziziphus", "ceratonia", "dimocarpus",
+            "litchi", "diospyros", "cestrum", "pleiogynium", "eugenia", "camellia", "acronychia", "alibertia", "antidesma", "chrysobalanus",
+            "cudrania", "ekebergia", "guettarda", "malpighia", "morus", "maclura", "maesa", "phellodendron", "psorospermum", "rhaphiolepis",
+            "salacca", "sideroxylon", "triphasia", "vaccinium", "zanthoxylum", "abiu", "ailanthus", "antidesma", "baccaurea", "carissa",
+            "cornus", "eugenia", "flacourtia", "hancornia", "icacinaceae", "jaboticaba", "lonicera", "manilkara", "melicoccus", "muntingia",
+            "peumus", "pouteria", "prunus", "punica", "strophanthus", "terminalia", "vepris", "vuattouxia", "albizzia", "anadenanthera",
+            "apodytes", "casearia", "chrysophyllum", "citharexylum", "colophospermum", "coprosma", "cryptocarya", "diospyros", "flindersia",
+            "fuscoporia", "hovenia", "hyperacanthus", "liriodendron", "mammea", "neobalanocarpus", "neocarya", "ocotea", "olax", "oreomunnea",
+            "phyllocladus", "pseudocarya", "pyrenacantha", "rhizophora", "sarcocephalus", "sloanea", "sorbus", "strophanthus", "swartzia",
+            "tetracera", "tetraclinis", "tilia", "tristaniopsis", "turpinia", "urena", "xanthoceras", "zyziphus", "bagassa", "barringtonia",
+            "berberis", "betula", "broussonetia", "callicarpa", "callitris", "calocedrus", "campomanesia", "celastrus", "cercis", "chimarrhis",
+            "chionanthus", "clytostoma", "cneoridium", "cornus", "corymbia", "cotinus", "cryptocarya", "daphne", "dendropanax", "dillenia",
+            "diospyros", "erythroxylum", "erythroxylum", "eucalyptus", "euonymus", "ficus", "garcinia", "gevuina", "glyptostrobus", "gymnosporia",
+            "halesia", "heptacodium", "hippophae", "hymenaea", "ilex", "incarvillea", "isospora", "juglans", "jumellea", "keteleeria", "koelreuteria",
+            "lagerstroemia", "lithocarpus", "lithraea", "lomatia", "magnolia", "melaleuca", "mercurialis", "micromelum", "michelia", "millettia",
+            "murraya", "myrciaria", "nerium", "nestegis", "nuttallia", "ocimum", "osmanthus", "oxyanthus", "papaver", "parmelia", "persea", "phoenix",
+            "pinus", "podocarpus", "polyalthia", "populus", "pseudognaphalium", "quercus", "rhus", "ribes", "robinia", "sambucus", "sapium", "sassafras",
+            "schima", "sequoia", "sorbus", "spondias", "sterculia", "stewartia", "strophanthus", "symplocos", "syncarpia", "taxodium", "tecoma", "tepualia",
+            "thuja", "tristaniopsis", "trochodendron", "vaccinium", "viburnum", "vitis", "zanthoxylum"
+        ];
+        var chineseWords = [
+            "樹木", "螢火蟲", "溪流", "荷花", "樓梯", "月亮", "星星", "風車", "風箏", "雲朵",
+            "青草", "彩虹", "書本", "魔法", "幻想", "山丘", "小溪", "小鳥", "大象", "老虎",
+            "獅子", "孔雀", "山羊", "仙人掌", "海龜", "海星", "沙漠", "瀑布", "海浪", "河流",
+            "火山", "森林", "草原", "雨滴", "雪花", "大地", "風景", "遊樂園", "城堡", "蜂巢",
+            "房子", "村莊", "鄉村", "城市", "星期", "時光", "歷史", "地圖", "風格", "美食",
+            "文化", "音樂", "藝術", "舞蹈", "小提琴", "吉他", "鋼琴", "畫家", "詩人", "作家",
+            "攝影", "美容", "時尚", "手工藝", "旅行", "歷險", "夢想", "希望", "神話", "傳說",
+            "英雄", "神秘", "魔術", "奇蹟", "幸福", "快樂", "微笑", "愛情", "友情", "家庭",
+            "回憶", "回家", "禮物", "生日", "慶祝", "節日", "冒險", "勇敢", "探險", "探索",
+            "奇幻", "想像", "夢境", "童話", "寶藏", "寶石", "秘密", "魔法森林", "仙境", "幻境"
+        ];
+        var score = 0;
+        var timeLeft = 60;
+        var gameStarted = false;
+        var timerInterval;
+
+        function startGame() 
+        {
+            if (!gameStarted)
+            {
+                score = 0;
+                updateScore();
+
+                $("#inputWord").val("");
+                $("#inputWord").prop("disabled", false);
+                $("#mode").prop("disabled", true);
+                $("#startButton").text("Restart");
+
+                generateRandomWord();
+                timeLeft = 60;
+                startTimer();
+                gameStarted = true;
+            } 
+            else 
+            {
+                // Restart game
+                clearInterval(timerInterval);
+
+                $("#timerValue").text(60);
+                $("#startButton").text("Start");
+                $("#inputWord").prop("disabled", true);
+                $("#mode").prop("disabled", false);
+                $("#randomWord").text("Press Start Button to Start");
+                $("#result").text("Score: 0");
+                $("#inputWord").val("");
+
+                gameStarted = false;
+            }
+        }
+
+        function generateRandomWord()
+        {
+            var selectedMode = $("#mode").val();
+
+            if(selectedMode == 'english')
+            {
+                var wordList = englishWords
+            }
+            else
+            {
+                var wordList = chineseWords
+            }
+
+            var randomIndex = Math.floor(Math.random() * wordList.length);
+            var randomWord = wordList[randomIndex];
+            $("#randomWord").text(randomWord);
+        }
+
+        $("#startButton").click(startGame);
+
+        $("#inputWord").keyup(function(e){
+            if(e.which == 13) //enter鍵
+            {
+                var typedWord = $(this).val();
+                var displayedLetter = $("#randomWord").text().trim();
+    
+                if (typedWord == displayedLetter)
+                {
+                    score++;
+                    updateScore();
+                    $(this).val("");
+                    generateRandomWord();
+                }
+            }
+        });
+
+        function updateScore()
+        {
+            $("#result").text("Score: " + score);
+        }
+
+        function startTimer()
+        {
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+    
+        function updateTimer()
+        {
+            timeLeft--;
+            $("#timerValue").text(timeLeft);
+            if (timeLeft <= 0)
+            {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }
+    
+        function endGame()
+        {
+            alert("Your type speed is " + score + "/mins");
+            startGame();
+        }
+    
+    });
+</script>
+</html>
